@@ -1,0 +1,11 @@
+Q1. Explain the order you placed your featured route and your detail route in, and what would happen if you swapped them.
+
+I placed the featured route before the detail route because Laravel reads routes from top to bottom and uses the first route that matches the URL. If I swapped them, the {id} route would match the word featured as an ID, so the featured page would not load and it would return a 404 Not Found error.
+
+Q2. What happens when someone visits an ID that does not exist in your data, and what did you write to make that happen?
+
+If someone visits an ID that is not included in my movie data, Laravel displays a 404 Not Found page. I made this happen by checking if the movie ID exists, and if it does not, I used abort(404) in my MovieController.
+
+Q3. Why do your links use route names instead of typed URLs? Give one concrete thing that would break if they did not.
+
+I used route names instead of hardcoded URLs because they make the application easier to maintain. If I change a route's URL later, links that use route names will still work, while hardcoded URLs would break and would need to be updated everywhere in the project.
