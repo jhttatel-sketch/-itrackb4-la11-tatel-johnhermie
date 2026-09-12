@@ -1,39 +1,60 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Book List</title>
-</head>
-<body>
+@extends('layouts.app')
 
-    <h1>My Book List</h1>
-    <p>Prepared by: John Hermie T. Tatel</p>
+@section('title', 'My Book List')
 
-    <table border="1" cellpadding="8">
+@section('content')
+
+<h2>My Book List</h2>
+
+<table class="table table-striped table-hover table-bordered mt-3">
+
+    <thead class="table-dark">
         <tr>
-            <th>ID</th>
+            <th>No.</th>
             <th>Title</th>
             <th>Author</th>
             <th>Year</th>
             <th>Genre</th>
         </tr>
+    </thead>
 
-        @foreach ($books as $book)
-        <tr>
-            <td>{{ $book['id'] }}</td>
+    <tbody>
 
-            <td>
-                <a href="{{ route('books.show', $book['id']) }}">
-                    {{ $book['title'] }}
-                </a>
-            </td>
+        @forelse ($books as $book)
+            <tr @if($book['year'] >= 2020) class="table-warning" @endif>
 
-            <td>{{ $book['author'] }}</td>
-            <td>{{ $book['year'] }}</td>
-            <td>{{ $book['genre'] }}</td>
-        </tr>
-        @endforeach
+                <td>{{ $loop->iteration }}</td>
 
-    </table>
+                <td>
+                    <a href="{{ route('books.show', $book['id']) }}">
+                        {{ $book['title'] }}
+                    </a>
+                </td>
 
-</body>
-</html>
+                <td>{{ $book['author'] }}</td>
+
+                <td>
+                    {{ $book['year'] }}
+
+                    @if($book['year'] >= 2020)
+                        <span class="badge bg-success ms-2">Latest Book</span>
+                    @endif
+                </td>
+
+                <td>{{ $book['genre'] }}</td>
+
+            </tr>
+
+        @empty
+            <tr>
+                <td colspan="5" class="text-center text-danger">
+                    No books available!
+                </td>
+            </tr>
+        @endforelse
+
+    </tbody>
+
+</table>
+
+@endsection

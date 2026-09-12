@@ -1,40 +1,45 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ $book['title'] }}</title>
-</head>
-<body>
+@extends('layouts.app')
 
-    <h1>Book Details</h1>
+@section('title', $book['title'] . ' - Details')
 
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>ID</th>
-            <td>{{ $book['id'] }}</td>
-        </tr>
-        <tr>
-            <th>Title</th>
-            <td>{{ $book['title'] }}</td>
-        </tr>
-        <tr>
-            <th>Author</th>
-            <td>{{ $book['author'] }}</td>
-        </tr>
-        <tr>
-            <th>Year</th>
-            <td>{{ $book['year'] }}</td>
-        </tr>
-        <tr>
-            <th>Genre</th>
-            <td>{{ $book['genre'] }}</td>
-        </tr>
-    </table>
+@section('content')
 
-    <br>
+<h2 class="mb-4">Book Details</h2>
 
-    <p><strong>Prepared by:</strong> John Hermie T. Tatel</p>
+<div class="card shadow-sm" style="max-width: 550px;">
 
-    <a href="{{ route('books.index') }}">⬅ Back to Books</a>
+    <div class="card-header bg-dark text-white">
+        <h4 class="mb-0">Title: {{ $book['title'] }}</h4>
+    </div>
 
-</body>
-</html>
+    <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+
+            <li class="list-group-item">
+                <strong>ID:</strong> {{ $book['id'] }}
+            </li>
+
+            <li class="list-group-item">
+                <strong>Author:</strong> {{ $book['author'] }}
+            </li>
+
+            <li class="list-group-item">
+                <strong>Year:</strong> {{ $book['year'] }}
+            </li>
+
+            <li class="list-group-item">
+                <strong>Genre:</strong> {{ $book['genre'] }}
+            </li>
+
+        </ul>
+    </div>
+
+</div>
+
+<br>
+
+<a href="{{ route('books.index') }}" class="btn btn-primary">
+    ← Back to Books
+</a>
+
+@endsection
