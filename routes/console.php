@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\TeacherController;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
