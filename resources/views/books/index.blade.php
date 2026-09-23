@@ -1,60 +1,107 @@
 @extends('layouts.app')
 
-@section('title', 'My Book List')
+@section('title', 'Book List')
 
 @section('content')
 
-<h2>My Book List</h2>
+<h2>Book List</h2>
 
-<table class="table table-striped table-hover table-bordered mt-3">
+{{-- Active Filters --}}
+@if($genre || $year)
+    <div class="alert alert-info">
+        <strong>Active Filters:</strong>
 
-    <thead class="table-dark">
-        <tr>
-            <th>No.</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Year</th>
-            <th>Genre</th>
-        </tr>
-    </thead>
+        @if($genre)
+            Genre: <b>{{ $genre }}</b>
+        @endif
 
-    <tbody>
+        @if($year)
+            | Year: <b>{{ $year }}</b>
+        @endif
+    </div>
+@endif
 
-        @forelse ($books as $book)
-            <tr @if($book['year'] >= 2020) class="table-warning" @endif>
+{{-- Genre Filters --}}
+<h5>Filter by Genre</h5>
 
-                <td>{{ $loop->iteration }}</td>
+<p>
+    <a href="{{ route('books.index', ['genre'=>'Fantasy','year'=>$year]) }}" class="btn btn-outline-primary btn-sm">Fantasy</a>
 
-                <td>
-                    <a href="{{ route('books.show', $book['id']) }}">
-                        {{ $book['title'] }}
-                    </a>
-                </td>
+    <a href="{{ route('books.index', ['genre'=>'Romance','year'=>$year]) }}" class="btn btn-outline-primary btn-sm">Romance</a>
 
-                <td>{{ $book['author'] }}</td>
+    <a href="{{ route('books.index', ['genre'=>'Technology','year'=>$year]) }}" class="btn btn-outline-primary btn-sm">Technology</a>
 
-                <td>
-                    {{ $book['year'] }}
+    <a href="{{ route('books.index', ['genre'=>'Drama','year'=>$year]) }}" class="btn btn-outline-primary btn-sm">Drama</a>
 
-                    @if($book['year'] >= 2020)
-                        <span class="badge bg-success ms-2">Latest Book</span>
-                    @endif
-                </td>
+    <a href="{{ route('books.index', ['genre'=>'Adventure','year'=>$year]) }}" class="btn btn-outline-primary btn-sm">Adventure</a>
+</p>
 
-                <td>{{ $book['genre'] }}</td>
+{{-- Year Filters --}}
+<h5>Filter by Year</h5>
 
-            </tr>
+<p>
+    <a href="{{ route('books.index', ['year'=>1888,'genre'=>$genre]) }}" class="btn btn-outline-success btn-sm">1888</a>
 
-        @empty
+    <a href="{{ route('books.index', ['year'=>1892,'genre'=>$genre]) }}" class="btn btn-outline-success btn-sm">1892</a>
+
+    <a href="{{ route('books.index', ['year'=>1983,'genre'=>$genre]) }}" class="btn btn-outline-success btn-sm">1983</a>
+
+    <a href="{{ route('books.index', ['year'=>1985,'genre'=>$genre]) }}" class="btn btn-outline-success btn-sm">1985</a>
+
+    <a href="{{ route('books.index', ['year'=>2009,'genre'=>$genre]) }}" class="btn btn-outline-success btn-sm">2009</a>
+
+    <a href="{{ route('books.index', ['year'=>2020,'genre'=>$genre]) }}" class="btn btn-outline-success btn-sm">2020</a>
+</p>
+
+{{-- Clear Filters --}}
+<a href="{{ route('books.index') }}" class="btn btn-danger btn-sm mb-3">
+    Clear Filters
+</a>
+
+<div class="card shadow-sm">
+    <table class="table table-hover mb-0">
+
+        <thead class="table-dark">
             <tr>
-                <td colspan="5" class="text-center text-danger">
-                    No books available!
-                </td>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Year</th>
+                <th>Genre</th>
             </tr>
-        @endforelse
+        </thead>
 
-    </tbody>
+        <tbody>
+            @forelse ($books as $book)
 
-</table>
+                <tr>
+                    <td>{{ $book['id'] }}</td>
+
+                    <td>
+                        <a href="{{ route('books.show', $book['id']) }}">
+                            {{ $book['title'] }}
+                        </a>
+                    </td>
+
+                    <td>{{ $book['author'] }}</td>
+
+                    <td>{{ $book['year'] }}</td>
+
+                    <td>{{ $book['genre'] }}</td>
+                </tr>
+
+            @empty
+
+                <tr>
+                    <td colspan="5" class="text-center">
+                        No books found.
+                    </td>
+                </tr>
+
+            @endforelse
+        </tbody>
+
+    </table>
+</div>
 
 @endsection

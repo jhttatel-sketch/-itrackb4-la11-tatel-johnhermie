@@ -1,18 +1,21 @@
 @extends('layouts.app')
 
-@section('title', $book['title'] . ' - Details')
+@section('title', $book['title'].' - Details')
 
 @section('content')
 
-<h2 class="mb-4">Book Details</h2>
+<h2 class="mb-3">Book Details</h2>
 
-<div class="card shadow-sm" style="max-width: 550px;">
+<div class="card shadow-sm" style="max-width:500px">
 
     <div class="card-header bg-dark text-white">
-        <h4 class="mb-0">Title: {{ $book['title'] }}</h4>
+        <h4 class="mb-0">
+            Title: {{ $book['title'] }}
+        </h4>
     </div>
 
     <div class="card-body p-0">
+
         <ul class="list-group list-group-flush">
 
             <li class="list-group-item">
@@ -32,6 +35,7 @@
             </li>
 
         </ul>
+
     </div>
 
 </div>
@@ -39,7 +43,7 @@
 <br>
 
 <a href="{{ route('books.index') }}" class="btn btn-primary">
-    ← Back to Books
+    ← Book List
 </a>
 
 @endsection
