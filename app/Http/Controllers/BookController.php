@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 
 class BookController extends Controller
 {
-    // BOOK LIST + TWO FILTERS
     public function index(Request $request)
     {
         $books = $this->books();
@@ -14,105 +13,124 @@ class BookController extends Controller
         $genre = $request->query('genre');
         $year = $request->query('year');
 
-        $filteredBooks = [];
+        if ($genre) {
+            $books = array_filter($books, function ($book) use ($genre) {
+                return $book['genre'] === $genre;
+            });
+        }
 
-        foreach ($books as $id => $book) {
-
-            if ($genre && $book['genre'] != $genre) {
-                continue;
-            }
-
-            if ($year && $book['year'] != $year) {
-                continue;
-            }
-
-            $filteredBooks[$id] = $book;
+        if ($year) {
+            $books = array_filter($books, function ($book) use ($year) {
+                return $book['year'] == $year;
+            });
         }
 
         return view('books.index', [
-            'books' => $filteredBooks,
+            'books' => $books,
             'genre' => $genre,
-            'year' => $year,
+            'year' => $year
         ]);
     }
 
-    // BOOK DETAILS
+    public function create()
+    {
+        return view('books.create');
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|max:100',
+            'author' => 'required|max:100',
+            'year' => 'required|numeric|min:1000|max:2100',
+            'genre' => 'required|in:Fantasy,Romance,Technology,Drama,Adventure'
+        ]);
+
+        $books = $this->books();
+
+        $newId = empty($books)
+            ? 1
+            : max(array_column($books, 'id')) + 1;
+
+        $validated['id'] = $newId;
+
+        $books[] = $validated;
+
+        $this->saveBooks($books);
+
+        return redirect()
+            ->route('books.index')
+            ->with('success', 'Book added successfully!');
+    }
+
     public function show($id)
     {
         $books = $this->books();
 
-        if (!isset($books[$id])) {
+        if (!isset($books[$id - 1])) {
+            abort(404);
+        }
+
+        $book = null;
+
+        foreach ($books as $item) {
+            if ($item['id'] == $id) {
+                $book = $item;
+                break;
+            }
+        }
+
+        if ($book === null) {
             abort(404);
         }
 
         return view('books.show', [
-            'book' => $books[$id]
+            'book' => $book
         ]);
     }
 
-    // FEATURED BOOK
     public function featured()
     {
         $books = $this->books();
 
+        $featured = null;
+
+        foreach ($books as $book) {
+            if ($book['id'] == 6) {
+                $featured = $book;
+                break;
+            }
+        }
+
+        if ($featured === null) {
+            abort(404);
+        }
+
         return view('books.featured', [
-            'book' => $books[6]
+            'book' => $featured
         ]);
     }
 
-    // BOOK DATA
     private function books()
     {
-        return [
+        $path = storage_path('app/books.json');
 
-            1 => [
-                'id' => 1,
-                'title' => 'Anime',
-                'author' => 'Jjun Amaro',
-                'year' => 1888,
-                'genre' => 'Fantasy'
-            ],
+        if (!file_exists($path)) {
+            return [];
+        }
 
-            2 => [
-                'id' => 2,
-                'title' => 'Holly',
-                'author' => 'Justine Tacorda',
-                'year' => 1892,
-                'genre' => 'Romance'
-            ],
+        $data = file_get_contents($path);
 
-            3 => [
-                'id' => 3,
-                'title' => 'Wordtech',
-                'author' => 'Ronnie Vargas',
-                'year' => 1983,
-                'genre' => 'Technology'
-            ],
+        return json_decode($data, true);
+    }
 
-            4 => [
-                'id' => 4,
-                'title' => 'Blank',
-                'author' => 'Lhorenz Magtibay',
-                'year' => 1985,
-                'genre' => 'Drama'
-            ],
+    private function saveBooks(array $books)
+    {
+        $path = storage_path('app/books.json');
 
-            5 => [
-                'id' => 5,
-                'title' => 'Eimreh',
-                'author' => 'Eimreh San',
-                'year' => 2009,
-                'genre' => 'Adventure'
-            ],
-
-            6 => [
-                'id' => 6,
-                'title' => 'The Last Chapter',
-                'author' => 'John Tatel',
-                'year' => 2020,
-                'genre' => 'Fantasy'
-            ],
-
-        ];
+        file_put_contents(
+            $path,
+            json_encode($books, JSON_PRETTY_PRINT)
+        );
     }
 }

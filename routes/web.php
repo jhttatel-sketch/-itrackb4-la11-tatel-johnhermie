@@ -3,25 +3,31 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
 
-// Welcome Page
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Book List
-Route::get('/books', [BookController::class, 'index'])->name('books.index');
+Route::get('/books', [BookController::class, 'index'])
+    ->name('books.index');
 
-// Featured Book
-Route::get('/books/featured', [BookController::class, 'featured'])->name('books.featured');
+Route::get('/books/create', [BookController::class, 'create'])
+    ->name('books.create');
 
-// Old filter route redirects to query string filter
+Route::post('/books', [BookController::class, 'store'])
+    ->name('books.store');
+
+Route::get('/books/featured', [BookController::class, 'featured'])
+    ->name('books.featured');
+
+Route::get('/books/{id}', [BookController::class, 'show'])
+    ->name('books.show');
+
 Route::get('/books/filter/{genre?}', function ($genre = null) {
     if ($genre) {
-        return redirect()->route('books.index', ['genre' => $genre]);
+        return redirect()->route('books.index', [
+            'genre' => $genre
+        ]);
     }
 
     return redirect()->route('books.index');
 })->name('books.filter');
-
-// Book Details (ALWAYS LAST)
-Route::get('/books/{id}', [BookController::class, 'show'])->name('books.show');

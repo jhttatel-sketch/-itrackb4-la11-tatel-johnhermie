@@ -6,6 +6,13 @@
 
 <h2>Book List</h2>
 
+{{-- Add New Book Button --}}
+<div class="d-flex justify-content-end mb-3">
+    <a href="{{ route('books.create') }}" class="btn btn-success">
+        + Add New Book
+    </a>
+</div>
+
 {{-- Active Filters --}}
 @if($genre || $year)
     <div class="alert alert-info">
@@ -72,6 +79,7 @@
         </thead>
 
         <tbody>
+
             @forelse ($books as $book)
 
                 <tr>
@@ -99,6 +107,7 @@
                 </tr>
 
             @endforelse
+
         </tbody>
 
     </table>
