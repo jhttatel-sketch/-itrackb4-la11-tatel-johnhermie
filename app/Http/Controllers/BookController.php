@@ -2,39 +2,50 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
+use App\Models\Genre;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
     public function index(Request $request)
     {
-        $books = $this->books();
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        $query = Book::query();
 
         $genre = $request->query('genre');
         $year = $request->query('year');
 
         if ($genre) {
-            $books = array_filter($books, function ($book) use ($genre) {
-                return $book['genre'] === $genre;
-            });
+            $query->where('genre_id', $genre);
         }
 
         if ($year) {
-            $books = array_filter($books, function ($book) use ($year) {
-                return $book['year'] == $year;
-            });
+            $query->where('year', $year);
         }
+
+        // Load books and their genres efficiently
+        $books = $query->with('genre')->get();
+
+        // Count the queries executed so far
+        $queryCount = count(DB::getQueryLog());
 
         return view('books.index', [
             'books' => $books,
             'genre' => $genre,
-            'year' => $year
+            'year' => $year,
+            'queryCount' => $queryCount,
         ]);
     }
 
     public function create()
     {
-        return view('books.create');
+        $genres = Genre::all();
+
+        return view('books.create', compact('genres'));
     }
 
     public function store(Request $request)
@@ -43,20 +54,12 @@ class BookController extends Controller
             'title' => 'required|max:100',
             'author' => 'required|max:100',
             'year' => 'required|numeric|min:1000|max:2100',
-            'genre' => 'required|in:Fantasy,Romance,Technology,Drama,Adventure'
+            'genre_id' => 'required|exists:genres,id',
         ]);
 
-        $books = $this->books();
+        $validated['is_featured'] = $request->boolean('is_featured');
 
-        $newId = empty($books)
-            ? 1
-            : max(array_column($books, 'id')) + 1;
-
-        $validated['id'] = $newId;
-
-        $books[] = $validated;
-
-        $this->saveBooks($books);
+        Book::create($validated);
 
         return redirect()
             ->route('books.index')
@@ -65,72 +68,15 @@ class BookController extends Controller
 
     public function show($id)
     {
-        $books = $this->books();
+        $book = Book::with('genre')->findOrFail($id);
 
-        if (!isset($books[$id - 1])) {
-            abort(404);
-        }
-
-        $book = null;
-
-        foreach ($books as $item) {
-            if ($item['id'] == $id) {
-                $book = $item;
-                break;
-            }
-        }
-
-        if ($book === null) {
-            abort(404);
-        }
-
-        return view('books.show', [
-            'book' => $book
-        ]);
+        return view('books.show', compact('book'));
     }
 
     public function featured()
     {
-        $books = $this->books();
+        $book = Book::where('is_featured', true)->firstOrFail();
 
-        $featured = null;
-
-        foreach ($books as $book) {
-            if ($book['id'] == 6) {
-                $featured = $book;
-                break;
-            }
-        }
-
-        if ($featured === null) {
-            abort(404);
-        }
-
-        return view('books.featured', [
-            'book' => $featured
-        ]);
-    }
-
-    private function books()
-    {
-        $path = storage_path('app/books.json');
-
-        if (!file_exists($path)) {
-            return [];
-        }
-
-        $data = file_get_contents($path);
-
-        return json_decode($data, true);
-    }
-
-    private function saveBooks(array $books)
-    {
-        $path = storage_path('app/books.json');
-
-        file_put_contents(
-            $path,
-            json_encode($books, JSON_PRETTY_PRINT)
-        );
+        return view('books.featured', compact('book'));
     }
 }

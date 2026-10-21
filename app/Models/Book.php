@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Book extends Model
 {
@@ -10,7 +11,7 @@ class Book extends Model
         'title',
         'author',
         'year',
-        'genre',
+        'genre_id',
         'is_featured',
         'description',
     ];
@@ -21,5 +22,10 @@ class Book extends Model
             'year' => 'integer',
             'is_featured' => 'boolean',
         ];
+    }
+
+    public function genre(): BelongsTo
+    {
+        return $this->belongsTo(Genre::class);
     }
 }
