@@ -5,7 +5,7 @@
 
 @section('content')
 
-{{-- Query Counter in Upper-Left Corner --}}
+{{-- Query Counter --}}
 <div style="position: fixed; top: 10px; left: 10px; z-index: 9999;
             background: #222; color: white; padding: 8px 12px;
             border-radius: 5px; font-size: 13px;">
@@ -87,43 +87,68 @@
 
 {{-- Book Table --}}
 <div class="card shadow-sm">
-    <table class="table table-hover mb-0">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
 
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Year</th>
-                <th>Genre</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @forelse ($books as $book)
+            <thead class="table-dark">
                 <tr>
-                    <td>{{ $book->id }}</td>
-
-                    <td>
-                        <a href="{{ route('books.show', $book->id) }}">
-                            {{ $book->title }}
-                        </a>
-                    </td>
-
-                    <td>{{ $book->author }}</td>
-                    <td>{{ $book->year }}</td>
-                    <td>{{ $book->genre->name ?? 'Unknown' }}</td>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Year</th>
+                    <th>Genre</th>
+                    <th>Actions</th>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="5" class="text-center">
-                        No books found.
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
+            </thead>
 
-    </table>
+            <tbody>
+                @forelse ($books as $book)
+                    <tr>
+                        <td>{{ $book->id }}</td>
+
+                        <td>
+                            <a href="{{ route('books.show', $book) }}">
+                                {{ $book->title }}
+                            </a>
+                        </td>
+
+                        <td>{{ $book->author }}</td>
+                        <td>{{ $book->year }}</td>
+                        <td>{{ $book->genre->name ?? 'Unknown' }}</td>
+
+                        <td>
+                            <a href="{{ route('books.edit', $book) }}"
+                               class="btn btn-primary btn-sm mb-1">
+                                Edit
+                            </a>
+
+                            <form
+                                action="{{ route('books.destroy', $book) }}"
+                                method="POST"
+                                onsubmit="return confirm('Delete this record?')"
+                                style="display: inline-block;"
+                            >
+                                @csrf
+                                @method('DELETE')
+
+                                <button type="submit"
+                                        class="btn btn-danger btn-sm">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            No books found.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+
+        </table>
+    </div>
 </div>
 
 @endsection

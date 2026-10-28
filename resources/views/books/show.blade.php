@@ -1,49 +1,37 @@
+
 @extends('layouts.app')
 
-@section('title', $book['title'].' - Details')
+@section('title', 'Book Details')
 
 @section('content')
 
-<h2 class="mb-3">Book Details</h2>
+<h2 class="mb-4">Book Details</h2>
 
-<div class="card shadow-sm" style="max-width:500px">
+<div class="card">
+    <div class="card-body">
 
-    <div class="card-header bg-dark text-white">
-        <h4 class="mb-0">
-            Title: {{ $book['title'] }}
-        </h4>
-    </div>
+        <h3>{{ $book->title }}</h3>
 
-    <div class="card-body p-0">
+        <p><strong>ID:</strong> {{ $book->id }}</p>
 
-        <ul class="list-group list-group-flush">
+        <p><strong>Author:</strong> {{ $book->author }}</p>
 
-            <li class="list-group-item">
-                <strong>ID:</strong> {{ $book['id'] }}
-            </li>
+        <p><strong>Year:</strong> {{ $book->year }}</p>
 
-            <li class="list-group-item">
-                <strong>Author:</strong> {{ $book['author'] }}
-            </li>
+        <p>
+            <strong>Genre:</strong>
+            {{ $book->genre->name ?? 'No genre assigned' }}
+        </p>
 
-            <li class="list-group-item">
-                <strong>Year:</strong> {{ $book['year'] }}
-            </li>
+        <a href="{{ route('books.index') }}" class="btn btn-secondary">
+            Back to Books
+        </a>
 
-            <li class="list-group-item">
-                <strong>Genre:</strong> {{ $book['genre'] }}
-            </li>
-
-        </ul>
+        <a href="{{ route('books.edit', $book) }}" class="btn btn-primary">
+            Edit Book
+        </a>
 
     </div>
-
 </div>
-
-<br>
-
-<a href="{{ route('books.index') }}" class="btn btn-primary">
-    ← Book List
-</a>
 
 @endsection

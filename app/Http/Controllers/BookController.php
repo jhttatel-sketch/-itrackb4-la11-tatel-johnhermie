@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Book;
@@ -27,10 +26,7 @@ class BookController extends Controller
             $query->where('year', $year);
         }
 
-        // Load books and their genres efficiently
         $books = $query->with('genre')->get();
-
-        // Count the queries executed so far
         $queryCount = count(DB::getQueryLog());
 
         return view('books.index', [
@@ -66,11 +62,45 @@ class BookController extends Controller
             ->with('success', 'Book added successfully!');
     }
 
-    public function show($id)
+    public function show(Book $book)
     {
-        $book = Book::with('genre')->findOrFail($id);
+        $book->load('genre');
 
         return view('books.show', compact('book'));
+    }
+
+    public function edit(Book $book)
+    {
+        $genres = Genre::all();
+
+        return view('books.edit', compact('book', 'genres'));
+    }
+
+    public function update(Request $request, Book $book)
+    {
+        $validated = $request->validate([
+            'title' => 'required|max:100',
+            'author' => 'required|max:100',
+            'year' => 'required|numeric|min:1000|max:2100',
+            'genre_id' => 'required|exists:genres,id',
+        ]);
+
+        $validated['is_featured'] = $request->boolean('is_featured');
+
+        $book->update($validated);
+
+        return redirect()
+            ->route('books.index')
+            ->with('success', 'Book updated successfully!');
+    }
+
+    public function destroy(Book $book)
+    {
+        $book->delete();
+
+        return redirect()
+            ->route('books.index')
+            ->with('success', 'Book deleted successfully!');
     }
 
     public function featured()
